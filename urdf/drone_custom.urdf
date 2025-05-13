@@ -1,0 +1,141 @@
+<?xml version='1.0'?>
+
+<robot name="drone_custom" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  
+  <link name="base_footprint"></link>
+
+    <!-- STEP 2 - Drone Body = base_link -->
+  <joint name="base_footprint_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="base_footprint"/>
+    <child link="base_link" />
+  </joint>
+
+  <link name='base_link'>
+    <pose>0 0 0 0 0 0</pose>
+    <inertial>
+      <mass value="1"/>
+      <origin xyz="0.0 0 0" rpy=" 0 0 0"/>
+      <inertia
+          ixx="0.0120193" ixy="0" ixz="0"
+          iyy="0.023615" iyz="0"
+          izz="0.0120193"
+      />
+    </inertial>
+
+    <collision name='collision'>
+      <origin xyz="0 0 0" rpy=" 0 0 0"/> 
+      <geometry>
+        <box size=".1 .4 .4"/>
+      </geometry>
+    </collision>
+
+    <visual name='base_link_visual'>
+      <origin xyz="0 0 0" rpy=" 0 0 0"/>
+      <geometry>
+        <mesh filename = "package://drone_basic_py/meshes/drone_model_basic.dae"/>
+        <!-- <box size=".4 .2 .1"/> -->
+      </geometry>
+      <!-- <material name="orange"/> -->
+    </visual>
+
+    </link>
+
+<link name="rotor_1">
+  <visual>
+    <geometry>
+      <cylinder length="0.02" radius="0.01"/>
+    </geometry>
+  </visual>
+  <inertial>
+    <mass value="0.0001"/>
+    <inertia ixx="0.0000001" iyy="0.0000001" izz="0.0000001" ixy="0.0" ixz="0.0" iyz="0.0"/>
+  </inertial>
+</link>
+
+<joint name="rotor_1_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="rotor_1"/>
+  <origin xyz="0.1 0.1 0.0" rpy="0 0 0"/> <!-- adjust to your rotor position -->
+</joint>
+
+<link name="rotor_2">
+  <visual>
+    <geometry>
+      <cylinder length="0.02" radius="0.01"/>
+    </geometry>
+  </visual>
+  <inertial>
+    <mass value="0.0001"/>
+    <inertia ixx="0.0000001" iyy="0.0000001" izz="0.0000001" ixy="0.0" ixz="0.0" iyz="0.0"/>
+  </inertial>
+</link>
+
+<joint name="rotor_2_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="rotor_2"/>
+  <origin xyz="-0.1 0.1 0.0" rpy="0 0 0"/> <!-- adjust to your rotor position -->
+</joint>
+
+<link name="rotor_3">
+  <visual>
+    <geometry>
+      <cylinder length="0.02" radius="0.01"/>
+    </geometry>
+  </visual>
+  <inertial>
+    <mass value="0.0001"/>
+    <inertia ixx="0.0000001" iyy="0.0000001" izz="0.0000001" ixy="0.0" ixz="0.0" iyz="0.0"/>
+  </inertial>
+</link>
+
+<joint name="rotor_3_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="rotor_3"/>
+  <origin xyz="0.1 -0.1 0.0" rpy="0 0 0"/> <!-- adjust to your rotor position -->
+</joint>
+
+<link name="rotor_4">
+  <visual>
+    <geometry>
+      <cylinder length="0.02" radius="0.01"/>
+    </geometry>
+  </visual>
+  <inertial>
+    <mass value="0.0001"/>
+    <inertia ixx="0.0000001" iyy="0.0000001" izz="0.0000001" ixy="0.0" ixz="0.0" iyz="0.0"/>
+  </inertial>
+</link>
+
+<joint name="rotor_4_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="rotor_4"/>
+  <origin xyz="-0.1 -0.1 0.0" rpy="0 0 0"/> <!-- adjust to your rotor position -->
+</joint>
+
+  <!-- STEP 6 - Gazebo frictions and colors -->
+  <!-- <gazebo reference="left_wheel">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <minDepth>0.0001</minDepth>
+    <maxVel>1.0</maxVel>
+  </gazebo>
+
+  <gazebo reference="right_wheel">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <minDepth>0.0001</minDepth>
+    <maxVel>1.0</maxVel>
+  </gazebo>
+
+  <gazebo reference="base_link">
+    <mu1>0.000002</mu1>
+    <mu2>0.000002</mu2>
+  </gazebo> -->
+
+</robot>

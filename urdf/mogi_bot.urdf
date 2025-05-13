@@ -11,7 +11,7 @@
   <!-- STEP 1 - Robot footprint -->
   <link name="base_footprint"></link>
 
-  <!-- STEP 2 - Robot chassis = base_link -->
+  <!-- STEP 2 - Drone Body = base_link -->
   <joint name="base_footprint_joint" type="fixed">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <parent link="base_footprint"/>
@@ -150,29 +150,5 @@
       <!-- <material name="green"/> -->
     </visual>
   </link>
-
-  <!-- STEP 6 - Gazebo frictions and colors -->
-  <gazebo reference="left_wheel">
-    <mu1>0.2</mu1>
-    <mu2>0.2</mu2>
-    <kp>1000000.0</kp>
-    <kd>100.0</kd>
-    <minDepth>0.0001</minDepth>
-    <maxVel>1.0</maxVel>
-  </gazebo>
-
-  <gazebo reference="right_wheel">
-    <mu1>0.2</mu1>
-    <mu2>0.2</mu2>
-    <kp>1000000.0</kp>
-    <kd>100.0</kd>
-    <minDepth>0.0001</minDepth>
-    <maxVel>1.0</maxVel>
-  </gazebo>
-
-  <gazebo reference="base_link">
-    <mu1>0.000002</mu1>
-    <mu2>0.000002</mu2>
-  </gazebo>
 
 </robot>
