@@ -3,10 +3,10 @@
 <robot name="mogi_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <!-- STEP 5 - Gazebo plugin -->
-  <xacro:include filename="$(find bme_gazebo_basics)/urdf/mogi_bot_skid_steer.gazebo" />
+  <xacro:include filename="$(find drone_basic_py)/urdf/mogi_bot_skid_steer.gazebo" />
 
   <!-- STEP 4 - RViz colors -->
-  <xacro:include filename="$(find bme_gazebo_basics)/urdf/materials.xacro" />
+  <xacro:include filename="$(find drone_basic_py)/urdf/materials.xacro" />
 
   <!-- STEP 1 - Robot footprint -->
   <link name="base_footprint"></link>
@@ -42,7 +42,7 @@
       <origin xyz="0 0 0" rpy=" 0 0 0"/>
       <geometry>
         <!-- <box size=".4 .2 .1"/> -->
-        <mesh filename = "package://bme_gazebo_basics/meshes/mogi_bot.dae"/>
+        <mesh filename = "package://drone_basic_py/meshes/mogi_bot.dae"/>
       </geometry>
       <!-- <material name="orange"/> -->
     </visual>
@@ -81,7 +81,7 @@
       <origin xyz="0 0 0" rpy="0 1.5707 1.5707"/>
       <geometry>
         <!-- <cylinder radius=".1" length=".05"/> -->
-        <mesh filename = "package://bme_gazebo_basics/meshes/wheel.dae"/>
+        <mesh filename = "package://drone_basic_py/meshes/wheel.dae"/>
       </geometry>
       <!-- <material name="green"/> -->
     </visual>
@@ -118,7 +118,7 @@
       <origin xyz="0 0 0" rpy="0 1.5707 1.5707"/>
       <geometry>
         <!-- <cylinder radius=".1" length=".05"/> -->
-        <mesh filename = "package://bme_gazebo_basics/meshes/wheel.dae"/>
+        <mesh filename = "package://drone_basic_py/meshes/wheel.dae"/>
       </geometry>
       <!-- <material name="green"/> -->
     </visual>
@@ -155,7 +155,7 @@
       <origin xyz="0 0 0" rpy="0 1.5707 1.5707"/>
       <geometry>
         <!-- <cylinder radius=".1" length=".05"/> -->
-        <mesh filename = "package://bme_gazebo_basics/meshes/wheel.dae"/>
+        <mesh filename = "package://drone_basic_py/meshes/wheel.dae"/>
       </geometry>
       <!-- <material name="green"/> -->
     </visual>
@@ -192,7 +192,7 @@
       <origin xyz="0 0 0" rpy="0 1.5707 1.5707"/>
       <geometry>
         <!-- <cylinder radius=".1" length=".05"/> -->
-        <mesh filename = "package://bme_gazebo_basics/meshes/wheel.dae"/>
+        <mesh filename = "package://drone_basic_py/meshes/wheel.dae"/>
       </geometry>
       <!-- <material name="green"/> -->
     </visual>
