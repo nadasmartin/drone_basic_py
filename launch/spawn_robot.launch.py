@@ -9,9 +9,9 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
 
-    pkg_bme_ros2_navigation = get_package_share_directory('bme_ros2_navigation')
+    pkg_drone_basic_py = get_package_share_directory('drone_basic_py')
 
-    gazebo_models_path, ignore_last_dir = os.path.split(pkg_bme_ros2_navigation)
+    gazebo_models_path, ignore_last_dir = os.path.split(pkg_drone_basic_py)
     os.environ["GZ_SIM_RESOURCE_PATH"] += os.pathsep + gazebo_models_path
 
     rviz_launch_arg = DeclareLaunchArgument(
@@ -56,27 +56,27 @@ def generate_launch_description():
 
     # Define the path to your URDF or Xacro file
     urdf_file_path = PathJoinSubstitution([
-        pkg_bme_ros2_navigation,  # Replace with your package name
+        pkg_drone_basic_py,  # Replace with your package name
         "urdf",
         LaunchConfiguration('model')  # Replace with your URDF or Xacro file
     ])
 
     gz_bridge_params_path = os.path.join(
-        get_package_share_directory('bme_ros2_navigation'),
+        pkg_drone_basic_py,
         'config',
         'gz_bridge.yaml'
     )
 
     # Generate path to config file
     interactive_marker_config_file_path = os.path.join(
-        get_package_share_directory('interactive_marker_twist_server'),
+        pkg_drone_basic_py,
         'config',
         'linear.yaml'
     )
 
     world_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(pkg_bme_ros2_navigation, 'launch', 'world.launch.py'),
+            os.path.join(pkg_drone_basic_py, 'launch', 'world.launch.py'),
         ),
         launch_arguments={
         'world': LaunchConfiguration('world'),
@@ -87,7 +87,7 @@ def generate_launch_description():
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
-        arguments=['-d', PathJoinSubstitution([pkg_bme_ros2_navigation, 'rviz', LaunchConfiguration('rviz_config')])],
+        arguments=['-d', PathJoinSubstitution([pkg_drone_basic_py, 'rviz', LaunchConfiguration('rviz_config')])],
         condition=IfCondition(LaunchConfiguration('rviz')),
         parameters=[
             {'use_sim_time': LaunchConfiguration('use_sim_time')},
@@ -177,7 +177,7 @@ def generate_launch_description():
         name='ekf_filter_node',
         output='screen',
         parameters=[
-            os.path.join(pkg_bme_ros2_navigation, 'config', 'ekf.yaml'),
+            os.path.join(pkg_drone_basic_py, 'config', 'ekf.yaml'),
             {'use_sim_time': LaunchConfiguration('use_sim_time')},
              ]
     )

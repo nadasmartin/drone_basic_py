@@ -7,8 +7,8 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     
-    pkg_bme_ros2_navigation = FindPackageShare('bme_ros2_navigation')
-    default_rviz_config_path = PathJoinSubstitution([pkg_bme_ros2_navigation, 'rviz', 'urdf.rviz'])
+    pkg_drone_basic_py = FindPackageShare('drone_basic_py')
+    default_rviz_config_path = PathJoinSubstitution([pkg_drone_basic_py, 'rviz', 'urdf.rviz'])
 
     # Show joint state publisher GUI for joints
     gui_arg = DeclareLaunchArgument(name='gui', default_value='true', choices=['true', 'false'],
@@ -19,7 +19,7 @@ def generate_launch_description():
                                     description='Absolute path to rviz config file')
     
 
-    # URDF model path within the bme_ros2_navigation package
+    # URDF model path within the drone_basic_py package
     model_arg = DeclareLaunchArgument(
         'model', default_value='mogi_bot.urdf',
         description='Name of the URDF description to load'
@@ -29,7 +29,7 @@ def generate_launch_description():
     urdf = IncludeLaunchDescription(
         PathJoinSubstitution([FindPackageShare('urdf_launch'), 'launch', 'display.launch.py']),
         launch_arguments={
-            'urdf_package': 'bme_ros2_navigation',
+            'urdf_package': 'drone_basic_py',
             'urdf_package_path': PathJoinSubstitution(['urdf', LaunchConfiguration('model')]),
             'rviz_config': LaunchConfiguration('rvizconfig'),
             'jsp_gui': LaunchConfiguration('gui')}.items()

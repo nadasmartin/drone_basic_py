@@ -1,4 +1,5 @@
 from setuptools import find_packages, setup
+from glob import glob
 
 package_name = 'drone_basic_py'
 
@@ -10,6 +11,10 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (f'share/{package_name}/launch', glob('launch/*.launch.py')),
+        (f'share/{package_name}/urdf', glob('urdf/*')),
+        (f'share/{package_name}/rviz', glob('rviz/*')),
+        (f'share/{package_name}/worlds', glob('worlds/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
