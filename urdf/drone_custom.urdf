@@ -1,17 +1,11 @@
 <?xml version='1.0'?>
 
-<robot name="mogi_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="drone_custom" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <!-- STEP 5 - Gazebo plugin -->
-  <xacro:include filename="$(find bme_gazebo_basics)/urdf/mogi_bot.gazebo" />
-
-  <!-- STEP 4 - RViz colors -->
-  <xacro:include filename="$(find bme_gazebo_basics)/urdf/materials.xacro" />
-
-  <!-- STEP 1 - Robot footprint -->
+  
   <link name="base_footprint"></link>
 
-  <!-- STEP 2 - Drone Body = base_link -->
+    <!-- STEP 2 - Drone Body = base_link -->
   <joint name="base_footprint_joint" type="fixed">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <parent link="base_footprint"/>
@@ -41,11 +35,38 @@
     <visual name='base_link_visual'>
       <origin xyz="0 0 0" rpy=" 0 0 0"/>
       <geometry>
-        <mesh filename = "package://drone_basic_py/meshes/drone_custom.dae"/>
+        <mesh filename = "package://drone_basic_py/meshes/drone_model_basic.dae"/>
         <!-- <box size=".4 .2 .1"/> -->
       </geometry>
       <!-- <material name="orange"/> -->
     </visual>
-  </link>
+
+    </link>
+
+
+
+  <!-- STEP 6 - Gazebo frictions and colors -->
+  <!-- <gazebo reference="left_wheel">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <minDepth>0.0001</minDepth>
+    <maxVel>1.0</maxVel>
+  </gazebo>
+
+  <gazebo reference="right_wheel">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <kp>1000000.0</kp>
+    <kd>100.0</kd>
+    <minDepth>0.0001</minDepth>
+    <maxVel>1.0</maxVel>
+  </gazebo>
+
+  <gazebo reference="base_link">
+    <mu1>0.000002</mu1>
+    <mu2>0.000002</mu2>
+  </gazebo> -->
 
 </robot>

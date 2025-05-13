@@ -21,7 +21,7 @@ def generate_launch_description():
 
     # URDF model path within the drone_basic_py package
     model_arg = DeclareLaunchArgument(
-        'model', default_value='mogi_bot.urdf',
+        'model', default_value='drone_custom.urdf',
         description='Name of the URDF description to load'
     )
 
