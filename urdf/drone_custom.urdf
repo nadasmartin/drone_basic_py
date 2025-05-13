@@ -13,22 +13,21 @@
   </joint>
 
   <link name='base_link'>
-    <pose>0 0 0.1 0 0 0</pose>
-
+    <pose>0 0 0 0 0 0</pose>
     <inertial>
-      <mass value="15.0"/>
+      <mass value="1"/>
       <origin xyz="0.0 0 0" rpy=" 0 0 0"/>
       <inertia
-          ixx="0.0625" ixy="0" ixz="0"
-          iyy="0.2125" iyz="0"
-          izz="0.25"
+          ixx="0.0120193" ixy="0" ixz="0"
+          iyy="0.023615" iyz="0"
+          izz="0.0120193"
       />
     </inertial>
 
     <collision name='collision'>
       <origin xyz="0 0 0" rpy=" 0 0 0"/> 
       <geometry>
-        <box size=".4 .2 .1"/>
+        <box size=".1 .4 .4"/>
       </geometry>
     </collision>
 
@@ -43,7 +42,77 @@
 
     </link>
 
+<link name="rotor_1">
+  <visual>
+    <geometry>
+      <cylinder length="0.02" radius="0.01"/>
+    </geometry>
+  </visual>
+  <inertial>
+    <mass value="0.0001"/>
+    <inertia ixx="0.0000001" iyy="0.0000001" izz="0.0000001" ixy="0.0" ixz="0.0" iyz="0.0"/>
+  </inertial>
+</link>
 
+<joint name="rotor_1_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="rotor_1"/>
+  <origin xyz="0.1 0.1 0.0" rpy="0 0 0"/> <!-- adjust to your rotor position -->
+</joint>
+
+<link name="rotor_2">
+  <visual>
+    <geometry>
+      <cylinder length="0.02" radius="0.01"/>
+    </geometry>
+  </visual>
+  <inertial>
+    <mass value="0.0001"/>
+    <inertia ixx="0.0000001" iyy="0.0000001" izz="0.0000001" ixy="0.0" ixz="0.0" iyz="0.0"/>
+  </inertial>
+</link>
+
+<joint name="rotor_2_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="rotor_2"/>
+  <origin xyz="-0.1 0.1 0.0" rpy="0 0 0"/> <!-- adjust to your rotor position -->
+</joint>
+
+<link name="rotor_3">
+  <visual>
+    <geometry>
+      <cylinder length="0.02" radius="0.01"/>
+    </geometry>
+  </visual>
+  <inertial>
+    <mass value="0.0001"/>
+    <inertia ixx="0.0000001" iyy="0.0000001" izz="0.0000001" ixy="0.0" ixz="0.0" iyz="0.0"/>
+  </inertial>
+</link>
+
+<joint name="rotor_3_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="rotor_3"/>
+  <origin xyz="0.1 -0.1 0.0" rpy="0 0 0"/> <!-- adjust to your rotor position -->
+</joint>
+
+<link name="rotor_4">
+  <visual>
+    <geometry>
+      <cylinder length="0.02" radius="0.01"/>
+    </geometry>
+  </visual>
+  <inertial>
+    <mass value="0.0001"/>
+    <inertia ixx="0.0000001" iyy="0.0000001" izz="0.0000001" ixy="0.0" ixz="0.0" iyz="0.0"/>
+  </inertial>
+</link>
+
+<joint name="rotor_4_joint" type="fixed">
+  <parent link="base_link"/>
+  <child link="rotor_4"/>
+  <origin xyz="-0.1 -0.1 0.0" rpy="0 0 0"/> <!-- adjust to your rotor position -->
+</joint>
 
   <!-- STEP 6 - Gazebo frictions and colors -->
   <!-- <gazebo reference="left_wheel">
