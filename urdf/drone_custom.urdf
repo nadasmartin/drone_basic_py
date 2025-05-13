@@ -27,7 +27,7 @@
     <collision name='collision'>
       <origin xyz="0 0 0" rpy=" 0 0 0"/> 
       <geometry>
-        <box size=".1 .4 .4"/>
+        <box size=".4 .4 .1"/>
       </geometry>
     </collision>
 
@@ -58,6 +58,16 @@
   <parent link="base_link"/>
   <child link="rotor_1"/>
   <origin xyz="0.1 0.1 0.0" rpy="0 0 0"/> <!-- adjust to your rotor position -->
+  <transmission name="rotor_1_trans">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="rotor_1_joint">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="rotor_1_motor">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
 </joint>
 
 <link name="rotor_2">
@@ -76,6 +86,16 @@
   <parent link="base_link"/>
   <child link="rotor_2"/>
   <origin xyz="-0.1 0.1 0.0" rpy="0 0 0"/> <!-- adjust to your rotor position -->
+    <transmission name="rotor_2_trans">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="rotor_2_joint">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="rotor_2_motor">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
 </joint>
 
 <link name="rotor_3">
@@ -94,6 +114,16 @@
   <parent link="base_link"/>
   <child link="rotor_3"/>
   <origin xyz="0.1 -0.1 0.0" rpy="0 0 0"/> <!-- adjust to your rotor position -->
+    <transmission name="rotor_3_trans">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="rotor_3_joint">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="rotor_3_motor">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
 </joint>
 
 <link name="rotor_4">
@@ -112,6 +142,16 @@
   <parent link="base_link"/>
   <child link="rotor_4"/>
   <origin xyz="-0.1 -0.1 0.0" rpy="0 0 0"/> <!-- adjust to your rotor position -->
+    <transmission name="rotor_4_trans">
+  <type>transmission_interface/SimpleTransmission</type>
+  <joint name="rotor_4_joint">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+  <actuator name="rotor_4_motor">
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    <mechanicalReduction>1</mechanicalReduction>
+  </actuator>
+</transmission>
 </joint>
 
   <!-- STEP 6 - Gazebo frictions and colors -->

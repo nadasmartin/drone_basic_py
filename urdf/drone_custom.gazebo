@@ -2,12 +2,16 @@
 <?xml version="1.0"?>
 <robot>
   <gazebo>
-     <plugin name="rotor_1_force_plugin" filename="libgazebo_ros_rotor_1_force_plugin.so">
+     <!-- <plugin name="rotor_1_force_plugin" filename="libgazebo_ros_rotor_1_force_plugin.so">
          <ros>
              <namespace>/correct_namespace</namespace>
          </ros>
     <body_name>rotor_1</body_name>
     <topic_name>rotor_1/cmd_force</topic_name>
+    </plugin> -->
+    <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+       <robotNamespace>/</robotNamespace>
+       <controlPeriod>0.001</controlPeriod>
     </plugin>
   </gazebo>
 </robot>
