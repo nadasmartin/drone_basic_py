@@ -116,7 +116,7 @@ def generate_launch_description():
         arguments=[
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
             "drone/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist",
-            "/odom@nav_msgs/msg/Odometry@gz.msgs.Odometry",
+            "/model/drone_custom/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry",
             "/joint_states@sensor_msgs/msg/JointState@gz.msgs.Model",
             "/tf@tf2_msgs/msg/TFMessage@gz.msgs.Pose_V",
         ],
@@ -168,11 +168,12 @@ def generate_launch_description():
     )
 
     trajectory_node = Node(
-        package='mogi_trajectory_server',
-        executable='mogi_trajectory_server',
-        name='mogi_trajectory_server',
-        parameters=[{'reference_frame_id': 'map'}]
-    )
+    package='mogi_trajectory_server',
+    executable='mogi_trajectory_server',
+    name='mogi_trajectory_server',
+    parameters=[{'reference_frame_id': 'odom'},
+                {'robot_frame_id': 'drone/base_link'}]
+)
 
     ekf_node = Node(
         package='robot_localization',
@@ -195,8 +196,8 @@ def generate_launch_description():
 
     launchDescriptionObject = LaunchDescription()
 
-    #launchDescriptionObject.add_action(rviz_launch_arg)
-    #launchDescriptionObject.add_action(rviz_config_arg)
+    launchDescriptionObject.add_action(rviz_launch_arg)
+    launchDescriptionObject.add_action(rviz_config_arg)
     launchDescriptionObject.add_action(world_arg)
     launchDescriptionObject.add_action(model_arg)
     launchDescriptionObject.add_action(x_arg)
@@ -204,13 +205,13 @@ def generate_launch_description():
     launchDescriptionObject.add_action(yaw_arg)
     launchDescriptionObject.add_action(sim_time_arg)
     launchDescriptionObject.add_action(world_launch)
-    #launchDescriptionObject.add_action(rviz_node)
+    launchDescriptionObject.add_action(rviz_node)
     launchDescriptionObject.add_action(spawn_urdf_node)
     launchDescriptionObject.add_action(gz_bridge_node)
     launchDescriptionObject.add_action(gz_image_bridge_node)
     launchDescriptionObject.add_action(relay_camera_info_node)
     launchDescriptionObject.add_action(robot_state_publisher_node)
-    #launchDescriptionObject.add_action(trajectory_node)
+    launchDescriptionObject.add_action(trajectory_node)
     launchDescriptionObject.add_action(ekf_node)
     #launchDescriptionObject.add_action(interactive_marker_twist_server_node)
 
