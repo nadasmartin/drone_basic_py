@@ -115,11 +115,10 @@ def generate_launch_description():
         executable="parameter_bridge",
         arguments=[
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
-            "/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist",
+            "drone/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist",
             "/odom@nav_msgs/msg/Odometry@gz.msgs.Odometry",
             "/joint_states@sensor_msgs/msg/JointState@gz.msgs.Model",
             "/tf@tf2_msgs/msg/TFMessage@gz.msgs.Pose_V",
-            "/drone/rotor_1/cmd_force@geometry_msgs/msg/Wrench@gz.msgs.Wrench",
         ],
         output="screen",
         parameters=[
@@ -211,7 +210,7 @@ def generate_launch_description():
     launchDescriptionObject.add_action(gz_image_bridge_node)
     launchDescriptionObject.add_action(relay_camera_info_node)
     launchDescriptionObject.add_action(robot_state_publisher_node)
-    launchDescriptionObject.add_action(trajectory_node)
+    #launchDescriptionObject.add_action(trajectory_node)
     launchDescriptionObject.add_action(ekf_node)
     #launchDescriptionObject.add_action(interactive_marker_twist_server_node)
 

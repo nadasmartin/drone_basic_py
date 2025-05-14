@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <robot>
   <gazebo>
-    <plugin name="gz::sim::v8::systems::MulticopterMotorModel" filename="gz-sim-multicopter-motor-model-system">
+    <plugin name="gz::sim::v8::systems::MulticopterMotorModel" 
+    filename="gz-sim-multicopter-motor-model-system">
       <robotNamespace>drone</robotNamespace>
       <jointName>drone/rotor_0_joint</jointName>
       <linkName>drone/rotor_0</linkName>
@@ -20,7 +21,8 @@
       <motorType>velocity</motorType>
     </plugin>
 
-    <plugin name="gz::sim::v8::systems::MulticopterMotorModel" filename="gz-sim-multicopter-motor-model-system">
+    <plugin name="gz::sim::v8::systems::MulticopterMotorModel" 
+    filename="gz-sim-multicopter-motor-model-system">
       <robotNamespace>drone</robotNamespace>
       <jointName>drone/rotor_1_joint</jointName>
       <linkName>drone/rotor_1</linkName>
@@ -39,7 +41,8 @@
       <motorType>velocity</motorType>
     </plugin>
 
-    <plugin name="gz::sim::v8::systems::MulticopterMotorModel" filename="gz-sim-multicopter-motor-model-system">
+    <plugin name="gz::sim::v8::systems::MulticopterMotorModel" 
+    filename="gz-sim-multicopter-motor-model-system">
       <robotNamespace>drone</robotNamespace>
       <jointName>drone/rotor_2_joint</jointName>
       <linkName>drone/rotor_2</linkName>
@@ -58,7 +61,8 @@
       <motorType>velocity</motorType>
     </plugin>
 
-    <plugin name="gz::sim::v8::systems::MulticopterMotorModel" filename="gz-sim-multicopter-motor-model-system">
+    <plugin name="gz::sim::v8::systems::MulticopterMotorModel" 
+    filename="gz-sim-multicopter-motor-model-system">
       <robotNamespace>drone</robotNamespace>
       <jointName>drone/rotor_3_joint</jointName>
       <linkName>drone/rotor_3</linkName>
@@ -75,6 +79,50 @@
       <motorSpeedPubTopic>motor_speed/3</motorSpeedPubTopic>
       <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
       <motorType>velocity</motorType>
+    </plugin>
+
+    <plugin name="gz::sim::systems::MulticopterVelocityControl" 
+    filename="gz-sim-multicopter-control-system">
+      <robotNamespace>drone</robotNamespace>
+      <commandSubTopic>cmd_vel</commandSubTopic>
+      <enableSubTopic>enable</enableSubTopic>
+      <comLinkName>drone/base_footprint</comLinkName>
+      <velocityGain>2.7 2.7 2.7</velocityGain>
+      <attitudeGain>2 3 0.15</attitudeGain>
+      <angularRateGain>0.4 0.52 0.18</angularRateGain>
+      <maximumLinearAcceleration>2 2 2</maximumLinearAcceleration>
+
+      <rotorConfiguration>
+        <rotor>
+          <jointName>drone/rotor_0_joint</jointName>
+          <forceConstant>8.54858e-06</forceConstant>
+          <momentConstant>0.016</momentConstant>
+          <direction>1</direction>
+        </rotor>
+        <rotor>
+          <jointName>drone/rotor_1_joint</jointName>
+          <forceConstant>8.54858e-06</forceConstant>
+          <momentConstant>0.016</momentConstant>
+          <direction>1</direction>
+        </rotor>
+        <rotor>
+          <jointName>drone/rotor_2_joint</jointName>
+          <forceConstant>8.54858e-06</forceConstant>
+          <momentConstant>0.016</momentConstant>
+          <direction>-1</direction>
+        </rotor>
+        <rotor>
+          <jointName>drone/rotor_3_joint</jointName>
+          <forceConstant>8.54858e-06</forceConstant>
+          <momentConstant>0.016</momentConstant>
+          <direction>-1</direction>
+        </rotor>
+      </rotorConfiguration>
+    </plugin>
+    <plugin
+      filename="gz-sim-odometry-publisher-system"
+      name="gz::sim::systems::OdometryPublisher">
+      <dimensions>3</dimensions>
     </plugin>
   </gazebo>
 </robot>
