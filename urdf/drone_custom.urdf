@@ -37,6 +37,7 @@
     </visual>
   </link>
 
+<!-- Rotors and their joints -->
   <link name='drone/rotor_0'>
       <inertial>
         <mass value="0.005"/>
@@ -172,6 +173,57 @@
     <axis xyz="0 0 1" rpy="0 0 0"/>
     <dynamics damping="0.0" friction="0.0"/>
   </joint>
+
+<!-- Camera and its joint -->
+  <joint type="fixed" name="camera_joint">
+    <origin xyz="0.2 0 0.0" rpy="0 0 0"/>
+    <child link="camera_link"/>
+    <parent link="drone/base_link"/>
+    <axis xyz="0 1 0" />
+  </joint>
+
+  <link name='camera_link'>
+    <pose>0 0 0 0 0 0</pose>
+    <inertial>
+      <mass value="0.0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="1e-6" ixy="0" ixz="0"
+          iyy="1e-6" iyz="0"
+          izz="1e-6"
+      />
+    </inertial>
+
+    <collision name='collision'>
+      <origin xyz="0 0 0" rpy="0 0 0"/> 
+      <geometry>
+        <box size=".03 .03 .03"/>
+      </geometry>
+    </collision>
+
+    <visual name='camera_link_visual'>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size=".03 .03 .03"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <gazebo reference="camera_link">
+    <material>Gazebo/Red</material>
+  </gazebo>
+
+  <joint type="fixed" name="camera_optical_joint">
+    <origin xyz="0 0 0" rpy="-1.5707 0 -1.5707"/>
+    <child link="camera_link_optical"/>
+    <parent link="camera_link"/>
+  </joint>
+
+  <link name="camera_link_optical">
+  </link>
+
+
+
 
   <xacro:include filename="$(find drone_basic_py)/urdf/drone_custom.gazebo" />
 </robot>

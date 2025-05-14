@@ -119,6 +119,8 @@ def generate_launch_description():
             "/model/drone_custom/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry",
             "/joint_states@sensor_msgs/msg/JointState@gz.msgs.Model",
             "/tf@tf2_msgs/msg/TFMessage@gz.msgs.Pose_V",
+            "/camera/image@sensor_msgs/msg/Image@gz.msgs.Image",
+            "/camera/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo",
         ],
         output="screen",
         parameters=[
