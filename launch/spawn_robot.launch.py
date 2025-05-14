@@ -121,34 +121,9 @@ def generate_launch_description():
             "/tf@tf2_msgs/msg/TFMessage@gz.msgs.Pose_V",
             "/camera/image@sensor_msgs/msg/Image@gz.msgs.Image",
             "/camera/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo",
+            "imu@sensor_msgs/msg/Imu@gz.msgs.IMU",
         ],
         output="screen",
-        parameters=[
-            {'use_sim_time': LaunchConfiguration('use_sim_time')},
-        ]
-    )
-
-    # Node to bridge /cmd_vel and /odom
-    gz_image_bridge_node = Node(
-        package="ros_gz_image",
-        executable="image_bridge",
-        arguments=[
-            "/camera/image",
-        ],
-        output="screen",
-        parameters=[
-            {'use_sim_time': LaunchConfiguration('use_sim_time'),
-             'camera.image.compressed.jpeg_quality': 75},
-        ],
-    )
-
-    # Relay node to republish camera_info to /camera_info
-    relay_camera_info_node = Node(
-        package='topic_tools',
-        executable='relay',
-        name='relay_camera_info',
-        output='screen',
-        arguments=['camera/camera_info', 'camera/image/camera_info'],
         parameters=[
             {'use_sim_time': LaunchConfiguration('use_sim_time')},
         ]
@@ -210,8 +185,6 @@ def generate_launch_description():
     launchDescriptionObject.add_action(rviz_node)
     launchDescriptionObject.add_action(spawn_urdf_node)
     launchDescriptionObject.add_action(gz_bridge_node)
-    launchDescriptionObject.add_action(gz_image_bridge_node)
-    launchDescriptionObject.add_action(relay_camera_info_node)
     launchDescriptionObject.add_action(robot_state_publisher_node)
     launchDescriptionObject.add_action(trajectory_node)
     launchDescriptionObject.add_action(ekf_node)

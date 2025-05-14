@@ -222,8 +222,15 @@
   <link name="camera_link_optical">
   </link>
 
+<!-- IMU and its joint -->
+  <joint name="imu_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="drone/base_link"/>
+    <child link="imu_link" />
+  </joint>
 
-
-
+  <link name="imu_link">
+  </link>
+  
   <xacro:include filename="$(find drone_basic_py)/urdf/drone_custom.gazebo" />
 </robot>
