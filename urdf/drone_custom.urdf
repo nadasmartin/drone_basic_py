@@ -231,6 +231,16 @@
 
   <link name="imu_link">
   </link>
+
+<!-- GPS and its joint -->
+  <joint name="navsat_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="drone/base_link"/>
+    <child link="navsat_link" />
+  </joint>
+
+  <link name="navsat_link">
+  </link>
   
   <xacro:include filename="$(find drone_basic_py)/urdf/drone_custom.gazebo" />
 </robot>

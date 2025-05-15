@@ -35,17 +35,21 @@ def generate_launch_description():
     )
 
     x_arg = DeclareLaunchArgument(
-        'x', default_value='2.5',
+        'x', default_value='0.0',
         description='x coordinate of spawned robot'
     )
 
     y_arg = DeclareLaunchArgument(
-        'y', default_value='1.5',
+        'y', default_value='0.0',
         description='y coordinate of spawned robot'
+    )
+    z_arg = DeclareLaunchArgument(
+        'z', default_value='0.0',
+        description='z coordinate of spawned robot'
     )
 
     yaw_arg = DeclareLaunchArgument(
-        'yaw', default_value='-1.5707',
+        'yaw', default_value='0.0',
         description='yaw angle of spawned robot'
     )
 
@@ -116,12 +120,13 @@ def generate_launch_description():
         arguments=[
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
             "drone/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist",
-            "/model/drone_custom/odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry",
+            "drone/odom_ground_truth@nav_msgs/msg/Odometry@gz.msgs.Odometry",
             "/joint_states@sensor_msgs/msg/JointState@gz.msgs.Model",
-            "/tf@tf2_msgs/msg/TFMessage@gz.msgs.Pose_V",
+            #"/tf@tf2_msgs/msg/TFMessage@gz.msgs.Pose_V",
             "/camera/image@sensor_msgs/msg/Image@gz.msgs.Image",
             "/camera/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo",
             "imu@sensor_msgs/msg/Imu@gz.msgs.IMU",
+            "/navsat@sensor_msgs/msg/NavSatFix@gz.msgs.NavSat",
         ],
         output="screen",
         parameters=[
@@ -148,9 +153,17 @@ def generate_launch_description():
     package='mogi_trajectory_server',
     executable='mogi_trajectory_server',
     name='mogi_trajectory_server',
-    parameters=[{'reference_frame_id': 'odom'},
+    parameters=[{'reference_frame_id': 'odom_estimate'},
                 {'robot_frame_id': 'drone/base_link'}]
 )
+    trajectory_ground_truth_topic_node = Node(
+        package='mogi_trajectory_server',
+        executable='mogi_trajectory_server_topic_based',
+        name='mogi_trajectory_server_odom_topic',
+        parameters=[{'trajectory_topic': 'trajectory_ground_truth'},
+                    {'odometry_topic': 'drone/odom_ground_truth'},
+                    {'frame_id': 'odom_estimate'},]
+    )
 
     ekf_node = Node(
         package='robot_localization',
@@ -163,12 +176,20 @@ def generate_launch_description():
              ]
     )
 
-    interactive_marker_twist_server_node = Node(
-        package='interactive_marker_twist_server',
-        executable='marker_server',
-        name='twist_server_node',
-        parameters=[interactive_marker_config_file_path],
+    navsat_node = Node(
+        package='robot_localization',
+        executable='navsat_transform_node',
+        name='navsat_transform_node',
         output='screen',
+        parameters=[
+            os.path.join(pkg_drone_basic_py, 'config', 'navsat_transformation.yaml'),
+            {'use_sim_time': LaunchConfiguration('use_sim_time')},
+        ],
+        remappings=[('imu/data', 'imu'),
+                    ('gps/fix', 'navsat'), 
+                    ('gps/filtered', 'gps/filtered'),
+                    ('odometry/gps', 'odometry/gps'),
+                    ('odometry/filtered', 'odometry/filtered')]
     )
 
     launchDescriptionObject = LaunchDescription()
@@ -179,6 +200,7 @@ def generate_launch_description():
     launchDescriptionObject.add_action(model_arg)
     launchDescriptionObject.add_action(x_arg)
     launchDescriptionObject.add_action(y_arg)
+    launchDescriptionObject.add_action(z_arg)
     launchDescriptionObject.add_action(yaw_arg)
     launchDescriptionObject.add_action(sim_time_arg)
     launchDescriptionObject.add_action(world_launch)
@@ -188,6 +210,7 @@ def generate_launch_description():
     launchDescriptionObject.add_action(robot_state_publisher_node)
     launchDescriptionObject.add_action(trajectory_node)
     launchDescriptionObject.add_action(ekf_node)
-    #launchDescriptionObject.add_action(interactive_marker_twist_server_node)
+    launchDescriptionObject.add_action(navsat_node)
+    launchDescriptionObject.add_action(trajectory_ground_truth_topic_node)
 
     return launchDescriptionObject

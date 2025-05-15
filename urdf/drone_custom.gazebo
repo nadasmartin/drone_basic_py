@@ -123,10 +123,8 @@
       filename="gz-sim-odometry-publisher-system"
       name="gz::sim::systems::OdometryPublisher">
       <dimensions>3</dimensions>
-      <odom_frame>odom</odom_frame>
-      <robot_base_frame>drone/base_footprint</robot_base_frame>
-      <odom_topic>odom_ground_truth</odom_topic>
-      <tf_topic>tf</tf_topic>
+      <odom_topic>drone/odom_ground_truth</odom_topic>
+      <xyz_offset>0 0 -0.5</xyz_offset>
     </plugin>
     <plugin name="gz::sim::systems::JointStatePublisher" 
     filename="gz-sim-joint-state-publisher-system">
@@ -176,5 +174,28 @@
       <gz_frame_id>imu_link</gz_frame_id>
     </sensor>
   </gazebo>
+
+  <gazebo reference="navsat_link">
+    <sensor name="navsat" type="navsat">
+      <always_on>1</always_on>
+      <update_rate>1</update_rate>
+      <topic>navsat</topic>
+      <gz_frame_id>navsat_link</gz_frame_id>
+    </sensor>
+  </gazebo>
+
+  <plugin
+      filename="gz-sim-navsat-system"
+      name="gz::sim::systems::NavSat">
+    </plugin>
+    <!-- Set the coordinates for the world origin -> Feri hegyi reptér -->
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>47.438998</latitude_deg>
+      <longitude_deg>19.268083</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
 
 </robot>
