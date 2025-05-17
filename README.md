@@ -129,3 +129,7 @@ A lokalizáció finomhangolását és vizsgálatát **RViz-ben** végeztük, a *
 
 Ennek köszönhetően vizuálisan is nyomon tudtuk követni a lokalizáció teljesítményét, és pontosan tudtuk hangolni a szűrő paramétereit.
 
+Az alábbi videóban a piros trajektória a ground truth és a zöld pedig a becsült.
+
+<video controls src="docs/20250517-1517-47.6764496.mp4" title="Title"></video>
+
