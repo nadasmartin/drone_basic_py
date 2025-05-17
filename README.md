@@ -43,6 +43,9 @@ A projekt során egy egyszerű, négymotoros kvadkopter URDF modellt készített
 - A modell két további `xacro` sablont használ:
   - `materials.xacro` – az egyedi anyagok és színek definiálásához.
   - `drone_custom.gazebo` – Gazebo pluginok és szimulációspecifikus beállítások hozzáadásához.
+
+  ![alt text](docs/image_tftree.png)
+  ![alt text](docs/image_drone_frames.png)
  
 
 ## Gazebo bővítmények és szenzorbeállítások
