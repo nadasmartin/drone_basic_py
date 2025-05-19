@@ -24,16 +24,16 @@
     <collision name='collision'>
       <origin xyz="0 0 0" rpy=" 0 0 0"/> 
       <geometry>
-        <box size=".4 .4 .1"/>
+        <box size=".4 .4 .102"/>
       </geometry>
     </collision>
 
     <visual name='base_link_visual'>
-      <origin xyz="0 0 0" rpy=" 0 0 0"/>
+      <origin xyz="0 0 -0.08" rpy=" 0 0 4.7124"/>
       <geometry>
-        <mesh filename = "package://drone_basic_py/meshes/drone_model_basic.dae"/>
+         <mesh filename="package://drone_basic_py/meshes/drone_model_v2.dae"/>
       </geometry>
-      <material name="orange"/>
+
     </visual>
   </link>
 
@@ -176,7 +176,7 @@
 
 <!-- Camera and its joint -->
   <joint type="fixed" name="camera_joint">
-    <origin xyz="0.2 0 0.0" rpy="0 0 0"/>
+    <origin xyz="0.18 0 -0.02" rpy="0 0 0"/>
     <child link="camera_link"/>
     <parent link="drone/base_link"/>
     <axis xyz="0 1 0" />
@@ -197,20 +197,21 @@
     <collision name='collision'>
       <origin xyz="0 0 0" rpy="0 0 0"/> 
       <geometry>
-        <box size=".03 .03 .03"/>
+        <cylinder radius="0.015" length="0.03"/>
       </geometry>
     </collision>
 
     <visual name='camera_link_visual'>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 1.5707  0"/>
       <geometry>
-        <box size=".03 .03 .03"/>
+        <cylinder radius="0.03" length="0.03"/>
       </geometry>
+      <material name="black"/> 
     </visual>
   </link>
 
   <gazebo reference="camera_link">
-    <material>Gazebo/Red</material>
+    <material>Gazebo/black</material>
   </gazebo>
 
   <joint type="fixed" name="camera_optical_joint">

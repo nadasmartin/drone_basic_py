@@ -44,7 +44,7 @@ def generate_launch_description():
         description='y coordinate of spawned robot'
     )
     z_arg = DeclareLaunchArgument(
-        'z', default_value='0.0',
+        'z', default_value='0',
         description='z coordinate of spawned robot'
     )
 
