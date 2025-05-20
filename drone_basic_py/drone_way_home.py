@@ -25,7 +25,9 @@ class GoHome(Node):
         self.declare_parameter('vertical_tolerance', 0.05)
         self.declare_parameter('landing_height',     0.15)
         self.declare_parameter('control_rate',       20.0)  # Hz
-        self.declare_parameter('xy_gain', 0.8)   
+        self.declare_parameter('xy_gain', 0.8)
+        self._last_twist = Twist()
+        
         # Topics / services
         odom_t = self.get_parameter('odom_topic').value
         cmd_t  = self.get_parameter('cmd_vel_topic').value
@@ -56,19 +58,26 @@ class GoHome(Node):
 
     def _cmd_watch_cb(self, msg: Twist) -> None:
         """Abort autonomous flight on any external cmd_vel."""
+        # ❶ If we’re idle, nothing to cancel
         if self.state == 'IDLE':
-            return  # no autonomous mission running
-        # magnitude of incoming command
-        mag = sum(map(abs, (
-            msg.linear.x, msg.linear.y, msg.linear.z,
-            msg.angular.x, msg.angular.y, msg.angular.z)))
-        if mag < 1e-4:
-            return  # essentially zero – ignore
-        # Ignore our own messages (published <150 ms ago) while autonomous
-        if (self.get_clock().now() - self._last_autonomous_pub).nanoseconds < 1.5e8:
-            return
+            return  
+
+        # ❷ Is this twist numerically identical to the one we just issued?
+        same = (
+            abs(msg.linear.x  - self._last_twist.linear.x)  < 1e-4 and
+            abs(msg.linear.y  - self._last_twist.linear.y)  < 1e-4 and
+            abs(msg.linear.z  - self._last_twist.linear.z)  < 1e-4 and
+            abs(msg.angular.x - self._last_twist.angular.x) < 1e-4 and
+            abs(msg.angular.y - self._last_twist.angular.y) < 1e-4 and
+            abs(msg.angular.z - self._last_twist.angular.z) < 1e-4
+        )
+        if same:
+            return  # merely our echo
+
+        # ❸ Anything else ⇒ manual override → stop mission
         self.state = 'IDLE'
-        self.get_logger().warn('cmd_vel detected - mission aborted.')
+        self.cmd_pub.publish(Twist())          # full stop
+        self.get_logger().warn('cmd_vel override – mission aborted.')
 
     def _srv_home_cb(self, _, res):
         if not self.home or not self.current:
@@ -139,7 +148,6 @@ class GoHome(Node):
         tol_z   = self.get_parameter('vertical_tolerance').value
         asc     = self.get_parameter('ascend_speed').value
         dsc     = self.get_parameter('descend_speed').value
-        crs     = self.get_parameter('cruise_speed').value
         land_z  = self.get_parameter('landing_height').value
         cruise_z = self.get_parameter('takeoff_height').value
         tw = Twist()  # all zeros
@@ -194,7 +202,7 @@ class GoHome(Node):
 
         # Publish and remember time (for cmd_vel filtering) -------------------
         self.cmd_pub.publish(tw)
-        self._last_autonomous_pub = self.get_clock().now()
+        self._last_twist = tw 
 
 # ───────── main ───────────────────────────────────────────────────────────────
 def main():
