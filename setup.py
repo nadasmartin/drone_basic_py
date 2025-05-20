@@ -17,6 +17,9 @@ setup(
         (f'share/{package_name}/worlds', glob('worlds/*')),
         (f'share/{package_name}/config', glob('config/*')),
         (f'share/{package_name}/meshes', glob('meshes/*')),
+        (f'share/{package_name}/basic_drone_py', glob('teleop_drone.py')),
+        (f'share/{package_name}/basic_drone_py', glob('drone_way_home.py')),
+        # (f'share/{package_name}/config', ['config/navsat_transform.yaml']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -27,6 +30,8 @@ setup(
     # tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'teleop_drone = drone_basic_py.teleop_drone:main',
+            'drone_way_home = drone_basic_py.drone_way_home:main',
         ],
     },
 )

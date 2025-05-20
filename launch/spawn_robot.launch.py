@@ -182,7 +182,7 @@ def generate_launch_description():
         name='navsat_transform_node',
         output='screen',
         parameters=[
-            os.path.join(pkg_drone_basic_py, 'config', 'navsat_transformation.yaml'),
+            os.path.join(pkg_drone_basic_py, 'config', 'navsat_transform.yaml'),
             {'use_sim_time': LaunchConfiguration('use_sim_time')},
         ],
         remappings=[('imu/data', 'imu'),
@@ -191,6 +191,18 @@ def generate_launch_description():
                     ('odometry/gps', 'odometry/gps'),
                     ('odometry/filtered', 'odometry/filtered')]
     )
+
+    waypoint_node = Node(
+        package='drone_basic_py',
+        executable='drone_way_home',
+        name='drone_way_home',
+        parameters=[{
+            'odom_topic': 'odometry/filtered',
+            'cmd_vel_topic': 'drone/cmd_vel',
+            'waypoint_topic': 'drone/waypoint',
+            'takeoff_height': 3.0,
+        }
+        ],)
 
     launchDescriptionObject = LaunchDescription()
 
@@ -212,5 +224,6 @@ def generate_launch_description():
     launchDescriptionObject.add_action(ekf_node)
     launchDescriptionObject.add_action(navsat_node)
     launchDescriptionObject.add_action(trajectory_ground_truth_topic_node)
+    launchDescriptionObject.add_action(waypoint_node)
 
     return launchDescriptionObject
