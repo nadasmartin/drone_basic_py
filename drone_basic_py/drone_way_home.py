@@ -7,6 +7,7 @@ from nav_msgs.msg import Odometry
 from rclpy.node import Node
 from std_msgs.msg import String
 from std_srvs.srv import Trigger
+import threading
 
 class GoHome(Node):
     # ───────── initialization ────────────────────────────────────────────────
@@ -182,10 +183,18 @@ class GoHome(Node):
 def main():
     rclpy.init()
     node = GoHome()
+
+    def spin_node():
+        try:
+            rclpy.spin(node)
+        except KeyboardInterrupt:
+            pass
+
+    spin_thread = threading.Thread(target=spin_node)
+    spin_thread.start()
+
     try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        pass
+        spin_thread.join()
     finally:
         node.destroy_node()
         rclpy.shutdown()
