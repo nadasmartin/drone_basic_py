@@ -8,6 +8,7 @@ from rclpy.node import Node
 from std_msgs.msg import String
 from std_srvs.srv import Trigger
 import threading
+import tf_transformations as tft
 
 class GoHome(Node):
     # ───────── initialization ────────────────────────────────────────────────
@@ -26,6 +27,7 @@ class GoHome(Node):
         self.declare_parameter('landing_height',     0.15)
         self.declare_parameter('control_rate',       20.0)  # Hz
         self.declare_parameter('xy_gain', 0.8)
+        self.last_odom = None
         self._last_twist = Twist()
         
         # Topics / services
@@ -43,7 +45,7 @@ class GoHome(Node):
         self.wpts:     list[tuple[float, float, float] | None] = [None] * 5
         self.target:   tuple[float, float, float] | None = None
         self.state: str = 'IDLE'
-        self._last_autonomous_pub = self.get_clock().now()  # only when FSM != IDLE
+        # self._last_autonomous_pub = self.get_clock().now()  # only when FSM != IDLE
         rate = self.get_parameter('control_rate').value
         self.create_timer(1.0 / rate, self._loop)
         self.get_logger().info('go_home node up -awaiting odometry…')
@@ -52,6 +54,7 @@ class GoHome(Node):
     def _odom_cb(self, msg: Odometry) -> None:
         p = msg.pose.pose.position
         self.current = (p.x, p.y, p.z)
+        self.last_odom = msg                      # ← store full message
         if self.home is None:
             self.home = self.current
             self.get_logger().info(f'Home set at {self.home}')
@@ -78,6 +81,11 @@ class GoHome(Node):
         self.state = 'IDLE'
         self.cmd_pub.publish(Twist())          # full stop
         self.get_logger().warn('cmd_vel override – mission aborted.')
+
+    def _to_body(self, vx_w: float, vy_w: float, yaw: float) -> tuple[float, float]:
+        """World-frame → body-frame XY rotation."""
+        cos, sin = math.cos(-yaw), math.sin(-yaw)
+        return cos * vx_w - sin * vy_w, sin * vx_w + cos * vy_w
 
     def _srv_home_cb(self, _, res):
         if not self.home or not self.current:
@@ -143,12 +151,18 @@ class GoHome(Node):
     def _loop(self):
         if self.current is None:
             return
+        if self.last_odom is None: 
+            return
+
         x, y, z = self.current
-        tol_xy  = self.get_parameter('position_tolerance').value
-        tol_z   = self.get_parameter('vertical_tolerance').value
-        asc     = self.get_parameter('ascend_speed').value
-        dsc     = self.get_parameter('descend_speed').value
-        land_z  = self.get_parameter('landing_height').value
+        q = self.last_odom.pose.pose.orientation  
+        yaw = tft.euler_from_quaternion(
+            [q.x, q.y, q.z, q.w])[2]
+        tol_xy = self.get_parameter('position_tolerance').value
+        tol_z = self.get_parameter('vertical_tolerance').value
+        asc = self.get_parameter('ascend_speed').value
+        dsc = self.get_parameter('descend_speed').value
+        land_z = self.get_parameter('landing_height').value
         cruise_z = self.get_parameter('takeoff_height').value
         tw = Twist()  # all zeros
 
@@ -201,6 +215,8 @@ class GoHome(Node):
             return
 
         # Publish and remember time (for cmd_vel filtering) -------------------
+        tw.linear.x, tw.linear.y = self._to_body(
+        tw.linear.x, tw.linear.y, yaw)
         self.cmd_pub.publish(tw)
         self._last_twist = tw 
 
