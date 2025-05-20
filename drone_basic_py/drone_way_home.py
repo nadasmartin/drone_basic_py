@@ -25,6 +25,7 @@ class GoHome(Node):
         self.declare_parameter('vertical_tolerance', 0.05)
         self.declare_parameter('landing_height',     0.15)
         self.declare_parameter('control_rate',       20.0)  # Hz
+        self.declare_parameter('xy_gain', 0.8)   
         # Topics / services
         odom_t = self.get_parameter('odom_topic').value
         cmd_t  = self.get_parameter('cmd_vel_topic').value
@@ -81,6 +82,20 @@ class GoHome(Node):
         self.get_logger().info('Home sequence initiated')
         res.success, res.message = True, 'Going home'
         return res
+
+    # ───────── waypoint handling ─────────────────────────────────────────────
+    def _vel_xy(self, dx: float, dy: float) -> tuple[float, float]:
+        """Simple P controller with speed saturation."""
+        k = self.get_parameter('xy_gain').value
+        vmax = self.get_parameter('cruise_speed').value
+        vx, vy = k * dx, k * dy  # P term
+        speed = math.hypot(vx, vy)
+        if speed > vmax:  # clamp to cruise_speed
+            scale = vmax / speed
+            vx *= scale
+            vy *= scale
+        return vx, vy
+
 
     def _waypoint_cb(self, msg: String) -> None:
         key = msg.data.strip()
@@ -141,10 +156,11 @@ class GoHome(Node):
             dx, dy = tx - x, ty - y
             dist = math.hypot(dx, dy)
             if dist > tol_xy:
-                tw.linear.x = crs * dx / dist
-                tw.linear.y = crs * dy / dist
+                # proportional XY controller (slows as it nears the goal)
+                tw.linear.x, tw.linear.y = self._vel_xy(dx, dy)
             else:
-                self.state = 'HOME_DESCEND'; self.get_logger().info('→ HOME_DESCEND')
+                self.state = 'HOME_DESCEND'
+                self.get_logger().info('→ HOME_DESCEND')
         elif self.state == 'HOME_DESCEND':
             if z > land_z + tol_z:
                 tw.linear.z = -dsc
@@ -161,10 +177,11 @@ class GoHome(Node):
             dx, dy = tx - x, ty - y
             dist = math.hypot(dx, dy)
             if dist > tol_xy:
-                tw.linear.x = crs * dx / dist
-                tw.linear.y = crs * dy / dist
+                tw.linear.x, tw.linear.y = self._vel_xy(dx, dy)
             else:
-                self.state = 'WP_ADJUST_Z'; self.get_logger().info('WP_ADJUST_Z')
+                self.state = 'WP_ADJUST_Z'
+                self.get_logger().info('WP_ADJUST_Z')
+
         elif self.state == 'WP_ADJUST_Z':
             _, _, tz = self.target
             diff = tz - z
