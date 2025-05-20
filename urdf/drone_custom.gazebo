@@ -158,8 +158,8 @@
         <camera_info_topic>camera/camera_info</camera_info_topic>
       </camera>
       <always_on>1</always_on>
-      <update_rate>3</update_rate>
-      <visualize>true</visualize>
+      <update_rate>1</update_rate>
+      <visualize>false</visualize>
       <topic>camera/image</topic>
     </sensor>
   </gazebo>
