@@ -1,9 +1,17 @@
 # Drón szimulációs környezet készítése, lokalizáció és autonóm drónirnyítás fejlesztése
 ### Robotrendszerek laboratórium(BMEGEMINMRL) házi feladat dokumentáció
 ### Balázs Miklós, Nádas Gergely Maritn
-
+<video controls src="docs/RoboLab_hazi_video.mp4" title="Title"></video>
+## Usage
+Szimuláció indítása:
+```
+ros2 launch drone_basic_py spawn_robot.launch.py
+```
+Általunk kibővített Teleop node indítása, a drón irányításához:
+```
+ros2 run drone_basic_py teleop_drone
+```
 # Gazebo-s környezet
-## Világ
 ## Drone modell
 ### Drone Mesh
 Ide majd írd le, amit gondolsz Miki.
