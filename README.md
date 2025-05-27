@@ -1,253 +1,224 @@
-# Drón szimulációs környezet készítése, lokalizáció és autonóm drónirányítás fejlesztése
-### Robotrendszerek laboratórium (BMEGEMINMRL) házi feladat dokumentáció
-### Balázs Miklós, Nádas Gergely Martin
+# Drone Simulation Environment, Localization and Autonomous Drone Control
+### Robotics Systems Laboratory (BMEGEMINMRL) Project Documentation
+### Miklós Balázs, Gergely Martin Nádas
 <video controls src="docs/RoboLab_hazi_video.mp4" title="Title"></video>
 
-## Tartalomjegyzék
+## Table of Contents
 
-1. [Install and setup](#install-and-setup)
+1. [Install and Setup](#install-and-setup)
    - [Prerequisites](#prerequisites)
-   - [Git Repo klónozása](#git-repo-klónozása)
+   - [Clone the Repository](#clone-the-repository)
 2. [Usage](#usage)
-   - [Szimuláció indítása](#szimuláció-indítása)
-   - [Teleop node indítása](#teleop-node-indítása)
-3. [Drone modell](#drone-modell)
-   - [Drone Mesh](#drone-mesh)
-   - [Drone URDF](#drone-urdf)
-     - [Szerkezeti felépítés](#szerkezeti-felépítés)
-       - [Törzs (base_link)](#törzs-base_link)
-       - [Rotorok](#rotorok)
-     - [Szenzorok](#szenzorok)
-       - [Kamera](#kamera)
-       - [IMU](#imu)
-       - [GPS](#gps)
-     - [Kiterjesztések és sablonok](#kiterjesztések-és-sablonok)
-4. [Gazebo bővítmények és szenzorbeállítások](#gazebo-bővítmények-és-szenzorbeállítások)
-   - [MulticopterMotorModel plugin](#multicoptermotormodel-plugin)
-   - [Vezérlés – VelocityControl plugin](#vezérlés--velocitycontrol-plugin)
-   - [Szenzorok](#szenzorok-1)
-     - [Kamera](#kamera-1)
-     - [IMU](#imu-1)
+   - [Start the Simulation](#start-the-simulation)
+   - [Launch the Tele-op Node](#launch-the-tele-op-node)
+3. [Drone Model](#drone-model)
+   - [Mesh](#mesh)
+   - [URDF](#urdf)
+     - [Structure](#structure)
+     - [Sensors](#sensors)
+     - [Extensions & Xacro Templates](#extensions--xacro-templates)
+4. [Gazebo Plugins & Sensor Configuration](#gazebo-plugins--sensor-configuration)
+   - [MulticopterMotorModel Plugin](#multicoptermotormodel-plugin)
+   - [Control – VelocityControl Plugin](#control--velocitycontrol-plugin)
+   - [Sensors](#sensors-1)
+     - [Camera](#camera)
+     - [IMU](#imu)
      - [GPS (NavSat)](#gps-navsat)
-   - [Pozíció és világbeállítások](#pozíció-és-világbeállítások)
-   - [Kiegészítő plugin-ek](#kiegészítő-plugin-ek)
-5. [Lokalizációs rendszer](#lokalizációs-rendszer)
-   - [Kalman-szűrő (EKF)](#kalman-szűrő-ekf)
-   - [GPS – Navsat átalakítás](#gps--navsat-átalakítás)
-   - [Vizualizáció és hangolás – Trajectory Server](#vizualizáció-és-hangolás--trajectory-server)
-6. [Szimuláció](#szimuláció)
-   - [Távirányítás](#távirányítás)
-     - [teleop_drone node](#teleop_drone-node)
-     - [drone_way_home node](#drone_way_home-node)
-       - [Finding home / waypoint](#finding-home--waypoint)
+   - [World & Geodetic Settings](#world--geodetic-settings)
+   - [Additional Plugins](#additional-plugins)
+5. [Localisation System](#localisation-system)
+   - [Kalman Filter (EKF)](#kalman-filter-ekf)
+   - [GPS → NavSat Transform](#gps--navsat-transform)
+   - [Visualisation & Tuning – Trajectory Server](#visualisation--tuning--trajectory-server)
+6. [Simulation](#simulation)
+   - [Drone Control](#drone-control)
+     - [teleop_drone Node](#teleop_drone-node)
+     - [drone_way_home Node](#drone_way_home-node)
 7. [Licence](#licence)
 
-## Install and setup
+## Install and Setup
 
 ### Prerequisites
-
-A használathoz ROS2 Jazzy desktop valamint Gazebo Harmonic telepítése szükséges.
-
-Továbbá a következő packagek:
+* **ROS 2 Jazzy** desktop  
+* **Gazebo Harmonic**  
+* `mogi_trajectory_server` package:
 ```bash
 git clone https://github.com/MOGI-ROS/mogi_trajectory_server
 ```
-
+* Python dependency:
 ```bash
 pip install tf-transformations
 ```
 
 
-### Git Repo klónozása
+### Clone the Repository
 
-A git repo a következő paranccsal klónozható a ROS2 workspace-be:
+You can clone the repo to your workspace:
 
 ```bash
 git clone https://github.com/nadasmartin/drone_basic_py.git
 ```
 
-Ezután a futtatáshoz szükséges:
+And don't forget to build and source:
 
 ```bash
 colcon build
-```
 
-valamint:
-
-```bash
 source install/setup.bash
 ```
-
+---
 
 ## Usage
-Szimuláció indítása:
-
+### Start the Simulation
 ```bash
 ros2 launch drone_basic_py spawn_robot.launch.py
 ```
-Általunk kibővített Teleop node indítása, a drón irányításához:
+This launch file starts Gazebo, spawns the drone into the default `home.sdf` world, runs RViz 2 and brings up all nodes required for localization and automatic return-to-home.
+
+### Launch the Tele-op Node
 ```bash
 ros2 run drone_basic_py teleop_drone
 ```
+The customised **Tele-op** node (forked from [`teleop_twist_keyboard`](https://index.ros.org/p/teleop_twist_keyboard/)) lets you control the drone with the keyboard via the `drone/cmd_vel` topic.
 
+---
 
-# Drone modell
+# Drone Model
 
-## Drone Mesh
-A projekt során egy egyszerű, négymotoros kvadkopter modellt készítettünk, melynek testének modelljét Inventorban hoztuk létre, majd ezt Blenderben textúráztuk fel és innen exportáltuk ki a végső `.dae` kiterjesztésű mesh fájlt, amelyet a ROS2 környezetben egészítettünk ki további alkatrészekkel.
+## Mesh
+We modelled a simple quad-rotor frame in Autodesk Inventor, textured it in Blender, and exported the final `.dae` mesh that is referenced from the URDF.
 
-  ![Drone body](docs/drone_body.png)
+![Drone body](docs/drone_body.png)
 
-## Drone URDF
+## URDF
+The URDF defines the frame, the four rotors and all sensors (camera, IMU, GPS).
 
- Az URDF modell tartalmazza a drón törzsét, rotorjait, valamint az autonóm működéshez szükséges szenzorokat (kamera, IMU, GPS).
+![Drone model](docs/drone_urdf.png)
 
-   ![Drone model](docs/drone_urdf.png)
+### Structure
+* **Body (`base_link`)** – lightweight box with realistic mass & inertia; visual uses the exported mesh.  
+* **Rotors** – links `rotor_0`…`rotor_3`, each attached through a `continuous` joint; colour-coded (red/blue) and configured for alternating CW/CCW spin.
 
-### Szerkezeti felépítés
+### Sensors
+* **Camera** – forward-facing RGB camera (`camera_link` & `camera_link_optical`).  
+* **IMU** – 100 Hz IMU at `imu_link`.  
+* **GPS** – NavSat link `navsat_link`.
 
-- **Törzs (`base_link`)**
-  - Egy könnyű doboz testet definiáltunk, amelyhez a rotorok és szenzorok kapcsolódnak.
-  - A törzshöz valósághű tömeg- és tehetetlenségi paramétereket rendeltünk.
-  - Megjelenéséhez a `.dae` formátumú 3D mesh modellt használtunk.
+### Extensions & Xacro Templates
+* `materials.xacro` – custom colours/materials.  
+* `drone_custom.gazebo` – Gazebo-specific plugins and settings.
 
-- **Rotorok**
-  - Négy rotor található a modellen: `rotor_0`, `rotor_1`, `rotor_2`, `rotor_3`.
-  - Mindegyik rotor külön linkként szerepel, és egy-egy folyamatos (`continuous`) típusú csuklóval (`joint`) csatlakozik a törzshöz.
-  - A rotorokat eltérő színekkel jelöltük (piros és kék), valamint eltérő irányú forgással (CW és CCW) modelleztük.
+![TF tree](docs/image_tftree.png)
+![Frames](docs/image_drone_frames.png)
 
-### Szenzorok
+---
 
-- **Kamera**
-  - Előre néző kamerát helyeztünk el a drón elején (`camera_link` és `camera_link_optical`).
-  - A kamera fix csuklóval csatlakozik a törzshöz, az optikai tengely megfelelő tájolásával.
-  - A Gazebo szimulációban piros színnel jelenik meg.
+# Gazebo Plugins & Sensor Configuration
 
-- **IMU**
-  - Az IMU-t a `imu_link` elem képviseli, amelyet fixen rögzítettünk a törzshöz.
-  - A későbbi szenzor plugin integrációkhoz megfelelő alapot biztosít.
-
-- **GPS**
-  - A `navsat_link` szintén egy fix csuklón keresztül kapcsolódik a törzshöz.
-  - A lokalizációhoz szükséges.
-
-### Kiterjesztések és sablonok
-
-- A modell két további `xacro` sablont használ:
-  - `materials.xacro` – az egyedi anyagok és színek definiálásához.
-  - `drone_custom.gazebo` – Gazebo pluginok és szimulációspecifikus beállítások hozzáadásához.
-
-  ![Drone node communication](docs/image_tftree.png)
-  ![Drone model with axes](docs/image_drone_frames.png)
- 
-
-# Gazebo bővítmények és szenzorbeállítások
-
-A Gazebo szimulációhoz a drónmodellünkhöz több, funkcionalitást biztosító plugin-t és szenzor konfigurációt integráltunk. Ezek biztosítják a fizikai szimuláció realisztikus viselkedését, valamint lehetővé teszik az autonóm vezérlést és a lokalizációt.
+For the Gazebo simulation the drone model is augmented with several plugins and sensor definitions.  
+These guarantee realistic physics while enabling autonomous control and reliable localisation.
 
 ## MulticopterMotorModel plugin
 
-Mind a négy rotorhoz külön `MulticopterMotorModel` plugin-t rendeltünk hozzá, amely a rotorok fizikai viselkedését modellezi:
 
-- Beállítottuk a forgásirányt (CW/CCW), a gyorsulási/lelassulási időállandókat és a maximális fordulatszámot.
-- A rotorok erő- és nyomaték-konstansait, valamint a légellenállási és gördülési momentummal kapcsolatos paramétereket is meghatároztuk.
-- Minden rotorhoz külön `motorSpeedPubTopic` került hozzárendelésre.
+Each of the four rotors has its own `MulticopterMotorModel` plugin, simulating rotor physics:
 
-## Vezérlés – VelocityControl plugin
+- Direction of rotation (CW / CCW), spin-up / spin-down time-constants and maximum RPM are set.  
+- Thrust and torque coefficients, plus drag and rolling-moment parameters, are tuned for each rotor.  
+- Every rotor has its dedicated `motorSpeedPubTopic`.
 
-A `MulticopterVelocityControl` plugin biztosítja az autonóm vezérlés lehetőségét:
+## Control – VelocityControl plugin
 
-- `drone/cmd_vel` topikon keresztül lineáris és szögsebesség parancsokat fogad.
-- Három szinten történik a vezérlés: sebesség, dőlésszög (attitűd) és szögsebesség.
+The `MulticopterVelocityControl` plugin provides the high-level autopilot:
 
-## Szenzorok
+- Receives linear and angular velocity commands on the `drone/cmd_vel` topic.  
+- Performs three cascaded loops: velocity → attitude → rate control.
 
-### Kamera
+## Sensors
 
-- Előre néző kamera került a drónra, amely 640×480 felbontású RGB képeket szolgáltat.
-- A képek enyhe Gauss-zajjal rendelkeznek a realisztikusabb szimuláció érdekében.
-- A kamera `camera/image` és `camera/camera_info` topikokra publikál.
+### Camera
+
+- Forward-facing camera delivering 640 × 480 RGB images.  
+- A mild Gaussian noise model is enabled for realism.  
+- Publishes on `camera/image` and `camera/camera_info`.
 
 ### IMU
 
-- 100 Hz frissítési frekvenciájú IMU került elhelyezésre a törzs középpontjában.
-- A szimulációban valósághű gyorsulás- és szögsebesség-adatokat szolgáltat.
-- Publikálási topik: `imu`.
+- 100 Hz inertial unit mounted at the centre of the frame.  
+- Provides realistic acceleration and angular-rate data.  
+- Publishes on `imu`.
 
 ### GPS (NavSat)
 
-- 1 Hz-es frissítési frekvenciájú GPS szenzort helyeztünk el a modellen.
-- A rendszer földrajzi helyzetét biztosítja.
-- Publikálási topik: `navsat`.
+- 1 Hz GPS receiver attached to the airframe.  
+- Supplies the global WGS-84 position.  
+- Publishes on `navsat`.
 
-## Pozíció és világbeállítások
+## World & Geodetic Settings
 
-- A szimulációs világ WGS84 koordináta-rendszerben van definiálva, a Ferihegyi repülőtéren:
-  - **Szélesség:** `47.438998°`
-  - **Hosszúság:** `19.268083°`
-  - **Tengerszint feletti magasság:** `0 m`
-- Az orientáció ENU (East-North-Up) rendszerű.
+- World origin fixed at Budapest Ferenc Liszt International Airport (LHBP)  
+  - **Latitude:** `47.438998°`  
+  - **Longitude:** `19.268083°`  
+  - **Altitude:** `0 m`  
+- ENU (East-North-Up) orientation.
 
-## Kiegészítő plugin-ek
+## Additional Plugins
 
-- **OdometryPublisher**: Publikálja a drón valós pozícióját a `drone/odom_ground_truth` topikra, lokalizáció fejlesztés során hasznos volt, hogy tudtuk mihez hasonlítani a lokalizáció aktuális képességét.
-- **JointStatePublisher**: Leképezi a rotorcsuklók állapotát a `joint_states` topikra.
+- **OdometryPublisher** – streams ground-truth pose on `drone/odom_ground_truth`, useful for evaluating localisation accuracy.  
+- **JointStatePublisher** – publishes rotor joint states on `joint_states`.
 
-## Lokalizációs rendszer
+## Localisation System
 
-A drón pozíciójának és orientációjának megbízható meghatározása érdekében a ROS 2-höz készült **robot_localization** csomagot használtuk. A rendszer az IMU és GPS adatok egyesítésével becsült pontos és szűrt állapotot biztosít a drón számára.
+Accurate pose estimation is provided by the **robot_localization** package, fusing IMU and GPS.
 
-### Kalman-szűrő (EKF)
+### Kalman Filter (EKF)
 
-Az állapotszűrés alapját az `ekf_node` adja, amely egy **Extended Kalman Filter** (EKF) algoritmust futtat:
+The `ekf_node` runs an **Extended Kalman Filter**:
 
-- A szűrő a `ekf.yaml` konfigurációs fájl alapján dolgozik.
-- A bemeneti szenzoradatok közé tartozik az IMU (`imu`) és a GPS alapú odometria (`odometry/gps`).
-- A szűrt állapot a `odometry/filtered` topikon jelenik meg.
+- Configured via `ekf.yaml`.  
+- Inputs: IMU (`imu`) and GPS-based odometry (`odometry/gps`).  
+- Output: filtered state on `odometry/filtered`.
 
-### GPS – Navsat átalakítás
+### GPS → NavSat Transform
 
-A GPS adatokat a `navsat_transform_node` dolgozza fel, amely a földrajzi koordinátákat a lokális térbe transzformálja:
+`navsat_transform_node` converts GPS fixes to the local frame:
 
-- A transzformáció beállításait a `navsat_transformation.yaml` fájl tartalmazza.
-- Az IMU adatokat a `imu` topikról, a nyers GPS adatokat a `navsat` topikról olvassa be.
-- Kimenetként a `odometry/gps` és `gps/filtered` topikokra publikál.
+- Parameters in `navsat_transformation.yaml`.  
+- Reads IMU from `imu`, raw GPS from `navsat`.  
+- Publishes `odometry/gps` and `gps/filtered`.
 
-### Vizualizáció és hangolás – Trajectory Server
+### Visualisation & Tuning – Trajectory Server
 
-A lokalizáció finomhangolását és vizsgálatát **RViz-ben** végeztük, a **mogi_trajectory_server** csomag segítségével. Ez lehetővé tette a becsült és a ground truth pozíciók összehasonlítását:
+Fine-tuning was done in **RViz** with the **mogi_trajectory_server** package:
 
-- A `mogi_trajectory_server` folyamatosan naplózza a szűrt pozíciót az `odom_estimate` frame-ben.
-- A `mogi_trajectory_server_topic_based` komponens a Gazebo-ból érkező `drone/odom_ground_truth` topikot jeleníti meg a `trajectory_ground_truth` néven.
+- `mogi_trajectory_server` logs the filtered trajectory in the `odom_estimate` frame.  
+- `mogi_trajectory_server_topic_based` displays Gazebo ground truth on `trajectory_ground_truth`.
 
-Ennek köszönhetően vizuálisan is nyomon tudtuk követni a lokalizáció teljesítményét, és pontosan tudtuk hangolni a szűrő paramétereit.
-
-Az alábbi videóban a piros trajektória a ground truth és a zöld pedig a becsült.
+This lets us compare EKF output (green) to ground truth (red) and adjust filter parameters precisely.
 
 <video controls src="docs/20250517-1517-47.6764496.mp4" title="Title"></video>
 
 
+## Simulation
 
-## Szimuláció
-
-A korábban elmített paranccsal elindíthatjuk a szimulációt:
+Start the simulation with the command shown earlier:
 
 ```bash
 ros2 launch drone_basic_py spawn_robot.launch.py
 ```
 
-Ez a launch file elindítja a Gazebo szimulációt, alapértelmezetten a `home.sdf` worldbe betölti a drone modelljét valamint elindítja az Rviz-t és a helymeghatározáshoz valamint az automatikus haza repüléshez szükséges node-okat.
+The launch file boots up Gazebo, loads the drone into the default `home.sdf` world, launches RViz 2, and starts every node needed for localisation and the automatic return-to-home routine.
 
-A `home.sdf` modell a https://github.com/MOGI-ROS/Week-3-4-Gazebo-basics könyvtárból származik.
+The `home.sdf` environment is taken from: https://github.com/MOGI-ROS/Week-3-4-Gazebo-basics
 
-### Távirányítás
+### Drone Control
 
 #### teleop_drone node
 ```bash
 ros2 run drone_basic_py teleop_drone
 ```
 
-A fenti paranccsal elindítható távirányító node-ot a [teleop_twist_keyboard] (https://index.ros.org/p/teleop_twist_keyboard/) módosításával hoztuk létre. Ezáltal billentyűzet segítségével küldhetünk a `drone/cmd_vel` topikra parancsokat:
+This customised tele-operation node is based on [teleop_twist_keyboard] (https://index.ros.org/p/teleop_twist_keyboard/) and lets you send commands to `drone/cmd_vel` with the keyboard:
 
 ```
 ---------------------------
@@ -277,18 +248,25 @@ CTRL-C to quit
 
 ```
 
-Az egyszerű vezérlés mellett kibővítettük a lehetséges parancsokat `go home` illetve `save waypoint`, valamint `go to waypoint` opciókkal, melyek a `h` illetve az `1` - `5` billentyűk segítségével aktiválhatóak és a 'drone/waypoint' topikra küldenek üzeneteket.
+Alongside basic manual control we added three extra commands: `go home`, `save waypoint` and `go to waypoint`. They are triggered with `h` and the number keys `1`–`5` and are published on the `drone/waypoint` topic.
 
-Ezeknek a parancsoknak a végrehajtásáért a `drone_way_home.py` node felel, amelyet a `spawn_robot.launch.py` szintén automatikusan indít.
+Their execution is handled by the `drone_way_home.py` node, which is started automatically by `spawn_robot.launch.py`.
 
 #### drone_way_home node
 
-Ez a node a `odometry/filtered` topikot figyeli, és automatikusan elmenti az első pozíciót mint home pozíció, illetve ha a 'drone/waypoint' topikon `1` - `5` parancsot kap, annak megfelelően 5 db waypoint koordinátát tud menteni. Ammenyiben már létezik mentett pozíció az adott billentyűparancs alatt, a drone elkezdi a manőverezést az adott helyre. 
+The node listens to `odometry/filtered`, saves the very first pose as the home position, and can store up to five waypoints sent on `drone/waypoint` (keys `1`–`5`).
+If a key is pressed again and a pose already exists in that slot, the drone begins navigating to it.
 
 ##### Finding home / waypoint
 
-A manőverezéshez a drone először `takeoff_height` paraméteren meghatározott magasságba emelkedik (default: 3 m), ha túl alacsonyan van, majd vízszintesen megközelíti a mentett pozíció X-Y koordinátáit PD szabályzás segítségével és ezután landol `home` parancs esetén, vagy ereszkedik a waypoint Z koordinátájának megfelelő magasságba.
+If the drone is below the `takeoff_height` parameter (default 3 m), it first climbs to that altitude.
+
+It then flies laterally to the saved X-Y coordinates using PD control.
+
+Finally, it lands when executing home, or descends to the waypoint’s Z altitude when executing a waypoint command.
+
+---
 
 ## Licence
 
-Ez a projekt az Apache License 2.0 alatt áll. Részletek a `LICENSE` fájlban.
+This project is released under the Apache License 2.0. See the LICENCE file for details.
