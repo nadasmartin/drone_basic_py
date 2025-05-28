@@ -1,7 +1,8 @@
 # Drone Simulation Environment, Localization and Autonomous Drone Control
 ### Robotics Systems Laboratory (BMEGEMINMRL) Project Documentation
 ### Miklós Balázs, Gergely Martin Nádas
-<video controls src="docs/RoboLab_hazi_video.mp4" title="Title"></video>
+[![RobLab Project Demo Video](docs/Demo_vid_snapshot.png)](docs/RoboLab_hazi_video.mp4)
+*(Click on image for video)*
 
 ## Table of Contents
 
